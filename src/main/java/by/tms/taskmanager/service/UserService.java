@@ -33,7 +33,7 @@ public class UserService {
                 .name(request.getName())
                 .surname(request.getSurname())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(request.getPassword())
                 .role(Role.USER)
                 .build();
 
@@ -57,9 +57,13 @@ public class UserService {
                     .build();
 
 
-            TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(), user.getRole());
+            TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRole());
         }
 
         return TOKEN;
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.getUserById(id).orElse(null);
     }
 }

@@ -4,7 +4,6 @@ import by.tms.taskmanager.dto.AuthRequestDto;
 import by.tms.taskmanager.dto.RegistrationRequestDto;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +19,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid RegistrationRequestDto request) {
+    public ResponseEntity<User> register(@RequestBody RegistrationRequestDto request) {
         return new ResponseEntity<>(userService.register(request), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDto request) {
+    public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
         return new ResponseEntity<>(userService.login(request), HttpStatus.OK);
     }
 }
