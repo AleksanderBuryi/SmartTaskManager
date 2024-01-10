@@ -29,6 +29,9 @@ public class UserService {
     private String TOKEN;
 
     public User register(RegistrationRequestDto request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent())
+            throw new RuntimeException("Email already exists"); //todo throw custom exception
+
         User userToRegister = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -43,22 +46,15 @@ public class UserService {
     }
 
     public String login(AuthRequestDto request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        User user  = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid password"); //todo throw custom exception
+        }
 
         Optional<User> byEmail = userRepository.findByEmail(request.getEmail());
-        if (byEmail.isPresent()) {
-            User user = byEmail.get();
-            UserPrincipal userPrincipal = UserPrincipal.builder()
-                    .email(user.getEmail())
-                    .password(user.getPassword())
-                    .role(user.getRole())
-                    .build();
 
-
-            TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRole());
-        }
+        TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRole());
 
         return TOKEN;
     }
