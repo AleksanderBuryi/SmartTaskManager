@@ -2,16 +2,16 @@ package by.tms.taskmanager.config;
 
 import by.tms.taskmanager.entity.Role;
 import by.tms.taskmanager.entity.UserPrincipal;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.function.Function;
 
 @Component
 public class JWTTokenProvider {
@@ -26,10 +26,10 @@ public class JWTTokenProvider {
         jwtSecret = Base64.getEncoder().encodeToString(jwtSecret.getBytes());
     }
 
-    public String generateToken(String email, String password, Role roles) {
+    public String generateToken(String email, String password, Set<Role> roles) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("password", password);
-        claims.put("roles", roles);
+        claims.put("roles", getUserRoleNamesFromJWT(roles));
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + jwtExpirationInMs);
@@ -42,23 +42,51 @@ public class JWTTokenProvider {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userEmail = extractEmail(token);
+    public Authentication getAuthentication(String token) {
+        UserPrincipal userPrincipal = new UserPrincipal();
 
-        return (userEmail.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        userPrincipal.setEmail(getUserEmailFromJWT(token));
+        userPrincipal.setPassword(getUserPasswordFromJWT(token));
+        userPrincipal.setRoles(getUserRolesFromJWT(token));
+
+        return new UsernamePasswordAuthenticationToken(userPrincipal, "", userPrincipal.getAuthorities());
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public Set<Role> getUserRolesFromJWT(String token) {
+        List<String> roles = (List<String>) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("roles");
+        return getUserRoleNamesFromJWT(roles);
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public String getUserEmailFromJWT(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public String getUserPasswordFromJWT(String token) {
+        return (String) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("password");
+    }
+
+    public String resolveToken(HttpServletRequest req) {
+        String bearerToken = req.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7, bearerToken.length());
+        }
+        return null;
+    }
+
+    @SneakyThrows
+    public boolean validateToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private Set<String> getUserRoleNamesFromJWT(Set<Role> roles) {
         Set<String> result = new HashSet<>();
-        roles.forEach(role -> result.add(role.name()));
+        roles.forEach(role -> result.add(role.getAuthority()));
         return result;
     }
 
@@ -66,24 +94,6 @@ public class JWTTokenProvider {
         Set<Role> result = new HashSet<>();
         roles.forEach(Role::valueOf);
         return result;
-    }
-
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-
-        return claimsResolver.apply(claims);
-    }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts
-                .parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
     }
 
 }

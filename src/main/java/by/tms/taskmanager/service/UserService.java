@@ -10,6 +10,7 @@ import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final JWTTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
 
     private String TOKEN;
 
@@ -36,9 +36,10 @@ public class UserService {
                 .name(request.getName())
                 .surname(request.getSurname())
                 .email(request.getEmail())
-                .password(request.getPassword())
-                .role(Role.USER)
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
+
+        userToRegister.getRoles().add(Role.USER);
 
         userRepository.save(userToRegister);
 
@@ -46,20 +47,38 @@ public class UserService {
     }
 
     public String login(AuthRequestDto request) {
-        User user  = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user  = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password"); //todo throw custom exception
         }
 
-        Optional<User> byEmail = userRepository.findByEmail(request.getEmail());
-
-        TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRole());
+        TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRoles());
 
         return TOKEN;
     }
 
-    public User getUserById(Long id) {
-        return userRepository.getUserById(id).orElse(null);
+    public Optional<User> getUserById(Long id) {
+        return userRepository.getUserById(id);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public void remove(User user) {
+        userRepository.delete(user);
+    }
+
+    public void removeById(Long id) {
+        if (id != null) {
+            userRepository.deleteById(id);
+        }
+    }
+
+    public void update(User user) {
+        if (user != null) {
+            userRepository.save(user);
+        }
     }
 }

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,20 +17,35 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    public Task create(TaskRequestDto request) {
+    public Task create(TaskRequestDto request, User user) {
         Task task = Task.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
+                .user(user)
                 .build();
 
-        //todo add user
         return taskRepository.save(task);
     }
 
     public List<Task> getTasksByUser(User user) {
-        //todo make getting user task list logic
         return taskRepository.findAllByUser(user);
+    }
+
+    public Optional<Task> findTaskById(Long id) {
+        return taskRepository.findById(id);
+    }
+
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
+
+    public Task updateTask(Task task) {
+        return taskRepository.save(task);
+    }
+
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
     }
 }
