@@ -1,6 +1,7 @@
 package by.tms.taskmanager.service;
 
 import by.tms.taskmanager.dto.TaskRequestDto;
+import by.tms.taskmanager.entity.Status;
 import by.tms.taskmanager.entity.Task;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.repository.TaskRepository;
@@ -23,6 +24,7 @@ public class TaskService {
                 .description(request.getDescription())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
+                .status(Status.TODO)
                 .user(user)
                 .build();
 

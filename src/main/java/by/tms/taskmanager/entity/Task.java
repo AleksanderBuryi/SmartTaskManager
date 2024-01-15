@@ -32,6 +32,6 @@ public class Task {
     private Status status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 }
