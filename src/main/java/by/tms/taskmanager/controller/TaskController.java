@@ -1,6 +1,6 @@
 package by.tms.taskmanager.controller;
 
-import by.tms.taskmanager.dto.TaskRequestDto;
+import by.tms.taskmanager.dto.request.TaskRequestDto;
 import by.tms.taskmanager.entity.Status;
 import by.tms.taskmanager.entity.Task;
 import by.tms.taskmanager.entity.User;
@@ -55,7 +55,6 @@ public class TaskController {
                     .name(request.getName())
                     .description(request.getDescription())
                     .startDate(request.getStartDate())
-                    .endDate(request.getEndDate())
                     .status(Status.INPROGRESS)
                     .build();
             updatedTask = taskService.updateTask(updatedTask);

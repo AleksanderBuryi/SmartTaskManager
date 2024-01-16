@@ -1,17 +1,13 @@
 package by.tms.taskmanager.service;
 
 import by.tms.taskmanager.config.JWTTokenProvider;
-import by.tms.taskmanager.dto.AuthRequestDto;
-import by.tms.taskmanager.dto.RegistrationRequestDto;
+import by.tms.taskmanager.dto.request.AuthRequestDto;
+import by.tms.taskmanager.dto.request.RegistrationRequestDto;
 import by.tms.taskmanager.entity.Role;
 import by.tms.taskmanager.entity.User;
-import by.tms.taskmanager.entity.UserPrincipal;
 import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

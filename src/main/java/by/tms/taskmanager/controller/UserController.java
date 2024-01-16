@@ -1,7 +1,7 @@
 package by.tms.taskmanager.controller;
 
-import by.tms.taskmanager.dto.AuthRequestDto;
-import by.tms.taskmanager.dto.RegistrationRequestDto;
+import by.tms.taskmanager.dto.request.AuthRequestDto;
+import by.tms.taskmanager.dto.request.RegistrationRequestDto;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.UserService;
 import lombok.RequiredArgsConstructor;

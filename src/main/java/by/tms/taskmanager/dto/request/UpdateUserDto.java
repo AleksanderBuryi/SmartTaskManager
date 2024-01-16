@@ -1,7 +1,8 @@
-package by.tms.taskmanager.dto;
+package by.tms.taskmanager.dto.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,18 +13,22 @@ import org.hibernate.validator.constraints.Range;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationRequestDto {
-    @NotNull(message = "This field shouldn't be null")
+public class UpdateUserDto {
+    @NotBlank
+    @NotEmpty
     private String name;
 
-    @NotNull(message = "This field shouldn't be null")
+    @NotBlank
+    @NotEmpty
     private String surname;
 
-    @NotNull(message = "This field shouldn't be null")
+    @NotBlank
+    @NotEmpty
     @Email
     private String email;
 
-    @NotNull(message = "This field shouldn't be null")
+    @NotBlank
+    @NotEmpty
     @Range(min = 4, max = 16)
     private String password;
 }

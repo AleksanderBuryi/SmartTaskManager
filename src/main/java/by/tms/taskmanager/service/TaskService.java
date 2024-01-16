@@ -1,6 +1,6 @@
 package by.tms.taskmanager.service;
 
-import by.tms.taskmanager.dto.TaskRequestDto;
+import by.tms.taskmanager.dto.request.TaskRequestDto;
 import by.tms.taskmanager.entity.Status;
 import by.tms.taskmanager.entity.Task;
 import by.tms.taskmanager.entity.User;
