@@ -3,6 +3,8 @@ package by.tms.taskmanager.service;
 import by.tms.taskmanager.config.JWTTokenProvider;
 import by.tms.taskmanager.dto.request.AuthRequestDto;
 import by.tms.taskmanager.dto.request.RegistrationRequestDto;
+import by.tms.taskmanager.dto.response.AuthResponseDto;
+import by.tms.taskmanager.dto.response.UserResponseDto;
 import by.tms.taskmanager.entity.Role;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.repository.UserRepository;
@@ -10,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +22,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JWTTokenProvider jwtTokenProvider;
 
-    private String TOKEN;
-
-    public User register(RegistrationRequestDto request) {
+    public UserResponseDto register(RegistrationRequestDto request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent())
             throw new RuntimeException("Email already exists"); //todo throw custom exception
 
@@ -36,41 +37,35 @@ public class UserService {
 
         userRepository.save(userToRegister);
 
-        return userToRegister;
+        return UserResponseDto.builder()
+                .id(userToRegister.getId())
+                .name(userToRegister.getName())
+                .surname(userToRegister.getSurname())
+                .email(userToRegister.getEmail())
+                .roles(userToRegister.getRoles())
+                .build();
     }
 
-    public String login(AuthRequestDto request) {
+    public AuthResponseDto login(AuthRequestDto request) {
         User user  = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password"); //todo throw custom exception
         }
 
-        TOKEN = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRoles());
+        String token = jwtTokenProvider.generateToken(user.getEmail(), user.getPassword(),  user.getRoles());
 
-        return TOKEN;
+        return AuthResponseDto.builder().token(token).build();
     }
 
     public Optional<User> getUserById(Long id) {
         return userRepository.getUserById(id);
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public void remove(User user) {
-        userRepository.delete(user);
-    }
-
-    public void removeById(Long id) {
-        if (id != null) {
-            userRepository.deleteById(id);
-        }
-    }
 
     public void update(User user) {
         if (user != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
         }
     }

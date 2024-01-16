@@ -2,6 +2,9 @@ package by.tms.taskmanager.controller;
 
 import by.tms.taskmanager.dto.request.AuthRequestDto;
 import by.tms.taskmanager.dto.request.RegistrationRequestDto;
+import by.tms.taskmanager.dto.request.UpdateUserDto;
+import by.tms.taskmanager.dto.response.AuthResponseDto;
+import by.tms.taskmanager.dto.response.UserResponseDto;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,46 +23,39 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegistrationRequestDto request) {
+    public ResponseEntity<UserResponseDto> register(@RequestBody RegistrationRequestDto request) {
         log.info("Creating new user: {}", request);
         return new ResponseEntity<>(userService.register(request), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody AuthRequestDto request) {
         log.info("Find user in database with email: " + request.getEmail());
         return new ResponseEntity<>(userService.login(request), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
-        log.info("Get user with id = " + id);
-        Optional<User> user = userService.getUserById(id);
-        return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        log.info("Getting all users");
-        List<User> users = userService.findAll();
-        return ResponseEntity.ok(users);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable("id") Long id) {
-        log.info("Delete user = " + id);
-        userService.removeById(id);
-        return ResponseEntity.noContent().build();
-    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable("id") Long id, @RequestBody UpdateUserDto userDto) {
         Optional<User> existingUser = userService.getUserById(id);
         if (existingUser.isPresent()) {
             log.info("Update user, because id = " + id + " was found.");
-            user.setId(id);
+            User user = User.builder()
+                    .id(id)
+                    .name(userDto.getName())
+                    .surname(userDto.getSurname())
+                    .email(userDto.getEmail())
+                    .password(userDto.getPassword())
+                    .build();
+
             userService.update(user);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(UserResponseDto.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .surname(user.getSurname())
+                    .email(user.getEmail())
+                    .roles(existingUser.get().getRoles())
+                    .build());
         } else {
             return ResponseEntity.notFound().build();
         }
