@@ -19,7 +19,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
 
     public TaskResponseDto create(TaskRequestDto request, User user) {
         Task task = Task.builder()
