@@ -19,4 +19,6 @@ public class StepRequestDto {
     @NotEmpty
     @NotBlank
     private String description;
+
+    private boolean isCompleted;
 }

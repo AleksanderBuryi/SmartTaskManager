@@ -13,4 +13,5 @@ public class StepResponseDto {
     private Long id;
     private String name;
     private String description;
+    private boolean isCompleted;
 }

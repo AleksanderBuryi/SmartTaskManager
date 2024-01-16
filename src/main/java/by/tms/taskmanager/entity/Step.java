@@ -21,6 +21,8 @@ public class Step {
 
     private String description;
 
+    private boolean isCompleted;
+
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;

@@ -43,18 +43,7 @@ public class TaskService {
 
     public List<TaskResponseDto> getTasksByUser(User user) {
         List<Task> tasks = taskRepository.findAllByUser(user);
-        List<TaskResponseDto> taskResponseDtoList = new ArrayList<>();
-        for (Task task : tasks) {
-            taskResponseDtoList.add(TaskResponseDto.builder()
-                    .id(task.getId())
-                    .name(task.getName())
-                    .description(task.getDescription())
-                    .startDate(task.getStartDate())
-                    .difficulty(task.getDifficulty())
-                    .status(task.getStatus())
-                    .build());
-        }
-        return taskResponseDtoList;
+        return getTaskResponseDtos(tasks);
     }
 
     public Optional<Task> findTaskById(Long id) {
@@ -63,6 +52,10 @@ public class TaskService {
 
     public List<TaskResponseDto> getAllTasks() {
         List<Task> tasks = taskRepository.findAll();
+        return getTaskResponseDtos(tasks);
+    }
+
+    private List<TaskResponseDto> getTaskResponseDtos(List<Task> tasks) {
         List<TaskResponseDto> taskResponseDtoList = new ArrayList<>();
         for (Task task : tasks) {
             taskResponseDtoList.add(TaskResponseDto.builder()
