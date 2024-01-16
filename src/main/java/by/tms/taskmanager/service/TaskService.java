@@ -2,15 +2,15 @@ package by.tms.taskmanager.service;
 
 import by.tms.taskmanager.dto.request.TaskRequestDto;
 import by.tms.taskmanager.dto.response.TaskResponseDto;
-import by.tms.taskmanager.entity.Difficulty;
-import by.tms.taskmanager.entity.Status;
-import by.tms.taskmanager.entity.Task;
-import by.tms.taskmanager.entity.User;
+import by.tms.taskmanager.entity.*;
 import by.tms.taskmanager.repository.TaskRepository;
+import by.tms.taskmanager.repository.TimeSpentRepository;
 import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TimeSpentRepository timeSpentRepository;
 
     public TaskResponseDto create(TaskRequestDto request, User user) {
         Task task = Task.builder()
@@ -31,6 +32,11 @@ public class TaskService {
                 .build();
 
         taskRepository.save(task);
+
+        TimeSpent timeSpent = timeSpentRepository.findTimeSpentByTask(task).get();
+        timeSpent.setStartTime(LocalDate.now());
+        timeSpentRepository.save(timeSpent);
+
         return TaskResponseDto.builder()
                 .name(task.getName())
                 .description(task.getDescription())
@@ -71,6 +77,13 @@ public class TaskService {
 
     public TaskResponseDto updateTask(Task task) {
         Task fromTask = taskRepository.save(task);
+
+        TimeSpent timeSpent = timeSpentRepository.findTimeSpentByTask(fromTask).get();
+        if (fromTask.getStatus() == Status.DONE) {
+            timeSpent.setEndTime(LocalDate.now());
+            timeSpentRepository.save(timeSpent);
+        }
+
         return TaskResponseDto.builder()
                 .id(fromTask.getId())
                 .name(fromTask.getName())

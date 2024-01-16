@@ -1,8 +1,10 @@
 package by.tms.taskmanager.controller;
 
 import by.tms.taskmanager.dto.request.TaskRequestDto;
+import by.tms.taskmanager.dto.response.StepResponseDto;
 import by.tms.taskmanager.dto.response.TaskResponseDto;
 import by.tms.taskmanager.entity.Status;
+import by.tms.taskmanager.entity.Step;
 import by.tms.taskmanager.entity.Task;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.TaskService;
@@ -82,5 +84,14 @@ public class TaskController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<TaskResponseDto> completeStep(@PathVariable Long id, @PathVariable Long userId) {
+        Optional<User> user = userService.getUserById(userId);
+        Optional<Task> task = taskService.findTaskById(id);
+        if (user.isEmpty() || task.isEmpty()) return ResponseEntity.notFound().build();
+        log.info("Complete task with id = " + id);
+        return ResponseEntity.ok(taskService.updateTask(Task.builder().id(id).status(Status.DONE).build()));
     }
 }
