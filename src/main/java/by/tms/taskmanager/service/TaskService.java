@@ -33,8 +33,10 @@ public class TaskService {
 
         taskRepository.save(task);
 
-        TimeSpent timeSpent = timeSpentRepository.findTimeSpentByTask(task).get();
-        timeSpent.setStartTime(LocalDate.now());
+        TimeSpent timeSpent = TimeSpent.builder()
+                .startTime(LocalDate.now())
+                .task(task)
+                .build();
         timeSpentRepository.save(timeSpent);
 
         return TaskResponseDto.builder()
