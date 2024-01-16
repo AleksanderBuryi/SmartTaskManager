@@ -23,7 +23,6 @@ public class TaskService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
                 .status(Status.TODO)
                 .user(user)
                 .build();
