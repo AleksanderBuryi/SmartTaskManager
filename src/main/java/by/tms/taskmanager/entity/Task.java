@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -26,7 +27,8 @@ public class Task {
 
     private LocalDate startDate;
 
-    private LocalDate endDate;
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -34,4 +36,7 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "task")
+    private List<Step> steps;
 }
