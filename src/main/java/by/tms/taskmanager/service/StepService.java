@@ -5,6 +5,7 @@ import by.tms.taskmanager.dto.response.StepResponseDto;
 import by.tms.taskmanager.entity.Step;
 import by.tms.taskmanager.entity.StepExecutionTime;
 import by.tms.taskmanager.entity.Task;
+import by.tms.taskmanager.mapper.GeneralMapper;
 import by.tms.taskmanager.repository.StepExecutionTimeRepository;
 import by.tms.taskmanager.repository.StepRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +22,11 @@ import java.util.Optional;
 public class StepService {
     private final StepRepository stepRepository;
     private final StepExecutionTimeRepository stepExecutionTimeRepository;
+    private final GeneralMapper generalMapper;
 
     public StepResponseDto create(StepRequestDto request, Task task) {
-        Step step = Step.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .completed(request.isCompleted())
-                .task(task)
-                .build();
+        Step step = generalMapper.mapToStep(request);
+        step.setTask(task);
 
         Step savedStep = stepRepository.save(step);
 
@@ -37,12 +35,7 @@ public class StepService {
                 .modifiedTime(LocalDateTime.now())
                 .build());
 
-        return StepResponseDto.builder()
-                .id(savedStep.getId())
-                .name(savedStep.getTitle())
-                .description(savedStep.getDescription())
-                .isCompleted(savedStep.isCompleted())
-                .build();
+        return generalMapper.mapToStepResponseDto(savedStep);
     }
 
     public List<StepResponseDto> findStepsByTask(Task task) {
@@ -64,23 +57,13 @@ public class StepService {
         }
         stepExecutionTimeRepository.save(stepTime);
 
-        return StepResponseDto.builder()
-                .id(fromStep.getId())
-                .name(fromStep.getTitle())
-                .description(fromStep.getDescription())
-                .isCompleted(fromStep.isCompleted())
-                .build();
+        return generalMapper.mapToStepResponseDto(fromStep);
     }
 
     private List<StepResponseDto> getStepsResponseDtos(List<Step> steps) {
         List<StepResponseDto> stepResponseDtoList = new ArrayList<>();
         for (Step step : steps) {
-            stepResponseDtoList.add(StepResponseDto.builder()
-                    .id(step.getId())
-                    .name(step.getTitle())
-                    .description(step.getDescription())
-                    .isCompleted(step.isCompleted())
-                    .build());
+            stepResponseDtoList.add(generalMapper.mapToStepResponseDto(step));
         }
         return stepResponseDtoList;
     }

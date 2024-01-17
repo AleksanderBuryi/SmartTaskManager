@@ -73,6 +73,7 @@ public class GeneralMapperTest {
 
         assertNotNull(responseDto);
         assertEquals(user.getId(), responseDto.getId());
+        assertEquals(user.getName(), responseDto.getName());
         assertEquals(user.getSurname(), responseDto.getSurname());
         assertEquals(user.getEmail(), responseDto.getEmail());
         assertEquals(user.getRoles(), responseDto.getRoles());
