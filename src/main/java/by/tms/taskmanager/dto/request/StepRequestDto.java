@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.mapstruct.Named;
 
 @Data
 @Builder
@@ -20,5 +21,5 @@ public class StepRequestDto {
     @NotBlank
     private String description;
 
-    private boolean isCompleted;
+    private boolean completed;
 }

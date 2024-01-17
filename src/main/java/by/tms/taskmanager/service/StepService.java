@@ -26,7 +26,7 @@ public class StepService {
         Step step = Step.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .isCompleted(request.isCompleted())
+                .completed(request.isCompleted())
                 .task(task)
                 .build();
 

@@ -23,7 +23,7 @@ public class Step {
 
     private String description;
 
-    private boolean isCompleted;
+    private boolean completed;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", nullable = false)

@@ -1,12 +1,11 @@
 package by.tms.taskmanager.controller;
 
 import by.tms.taskmanager.dto.request.TaskRequestDto;
-import by.tms.taskmanager.dto.response.StepResponseDto;
 import by.tms.taskmanager.dto.response.TaskResponseDto;
 import by.tms.taskmanager.entity.Status;
-import by.tms.taskmanager.entity.Step;
 import by.tms.taskmanager.entity.Task;
 import by.tms.taskmanager.entity.User;
+import by.tms.taskmanager.mapper.GeneralMapper;
 import by.tms.taskmanager.service.TaskService;
 import by.tms.taskmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +27,7 @@ import java.util.Optional;
 public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
+    private final GeneralMapper generalMapper;
 
     @PostMapping
     @Operation(summary = "Create task for user")
@@ -53,14 +53,8 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Get task by id = " + id);
         Optional<Task> existingTask = taskService.findTaskById(id);
-        return existingTask.map(task -> ResponseEntity.ok(TaskResponseDto.builder()
-                .id(task.getId())
-                .name(task.getName())
-                .description(task.getDescription())
-                .startDate(task.getStartDate())
-                .difficulty(task.getDifficulty())
-                .status(task.getStatus())
-                .build())).orElseGet(() -> ResponseEntity.notFound().build());
+        return existingTask.map(task -> ResponseEntity.ok(generalMapper.mapToTaskResponseDto(task)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
