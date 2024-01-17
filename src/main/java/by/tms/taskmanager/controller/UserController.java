@@ -40,20 +40,17 @@ public class UserController {
         Optional<User> existingUser = userService.getUserById(id);
         if (existingUser.isPresent()) {
             log.info("Update user, because id = " + id + " was found.");
-            User user = User.builder()
-                    .id(id)
-                    .name(userDto.getName())
-                    .surname(userDto.getSurname())
-                    .email(userDto.getEmail())
-                    .password(userDto.getPassword())
-                    .build();
+            existingUser.get().setName(userDto.getName());
+            existingUser.get().setSurname(userDto.getSurname());
+            existingUser.get().setEmail(userDto.getEmail());
+            existingUser.get().setPassword(userDto.getPassword());
 
-            userService.update(user);
+            userService.update(existingUser.get());
             return ResponseEntity.ok(UserResponseDto.builder()
-                    .id(user.getId())
-                    .name(user.getName())
-                    .surname(user.getSurname())
-                    .email(user.getEmail())
+                    .id(existingUser.get().getId())
+                    .name(existingUser.get().getName())
+                    .surname(existingUser.get().getSurname())
+                    .email(existingUser.get().getEmail())
                     .roles(existingUser.get().getRoles())
                     .build());
         } else {

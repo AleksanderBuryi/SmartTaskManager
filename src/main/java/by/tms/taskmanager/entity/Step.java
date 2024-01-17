@@ -23,7 +23,7 @@ public class Step {
 
     private boolean isCompleted;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "task_id")
     private Task task;
 }

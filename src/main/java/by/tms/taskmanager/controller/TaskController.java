@@ -62,12 +62,12 @@ public class TaskController {
         Optional<Task> existingTask = taskService.findTaskById(id);
         if (existingTask.isPresent()) {
             log.info("Update user with id = " + id);
-            Task updatedTask = Task.builder()
-                    .id(id)
-                    .name(request.getName())
-                    .description(request.getDescription())
-                    .status(Status.INPROGRESS)
-                    .build();
+
+            Task updatedTask = existingTask.get();
+            updatedTask.setName(request.getName());
+            updatedTask.setDescription(request.getDescription());
+            updatedTask.setStatus(Status.INPROGRESS);
+
             return ResponseEntity.ok(taskService.updateTask(updatedTask));
         } else {
             return ResponseEntity.notFound().build();
@@ -92,6 +92,10 @@ public class TaskController {
         Optional<Task> task = taskService.findTaskById(id);
         if (user.isEmpty() || task.isEmpty()) return ResponseEntity.notFound().build();
         log.info("Complete task with id = " + id);
-        return ResponseEntity.ok(taskService.updateTask(Task.builder().id(id).status(Status.DONE).build()));
+
+        Task completedTask = task.get();
+        completedTask.setStatus(Status.DONE);
+
+        return ResponseEntity.ok(taskService.updateTask(completedTask));
     }
 }

@@ -52,12 +52,11 @@ public class StepController {
         log.info("Update step with id = " + stepId);
 
         if (checkPath(stepId, taskId, userId)) return ResponseEntity.notFound().build();
-        Step updatedStep = Step.builder()
-                .id(stepId)
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .isCompleted(request.isCompleted())
-                .build();
+
+        Step updatedStep = stepService.findStepById(stepId).get();
+        updatedStep.setTitle(request.getTitle());
+        updatedStep.setDescription(request.getDescription());
+        updatedStep.setCompleted(request.isCompleted());
 
         return ResponseEntity.ok(stepService.updateStep(updatedStep));
     }
@@ -80,7 +79,11 @@ public class StepController {
 
         if (checkPath(stepId, taskId, userId)) return ResponseEntity.notFound().build();
         log.info("Complete Step with id = " + stepId);
-        return ResponseEntity.ok(stepService.updateStep(Step.builder().id(stepId).isCompleted(true).build()));
+
+        Step step = stepService.findStepById(stepId).get();
+        step.setCompleted(true);
+
+        return ResponseEntity.ok(stepService.updateStep(step));
     }
 
 
