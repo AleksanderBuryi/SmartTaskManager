@@ -7,6 +7,7 @@ import by.tms.taskmanager.dto.response.AuthResponseDto;
 import by.tms.taskmanager.dto.response.UserResponseDto;
 import by.tms.taskmanager.entity.Role;
 import by.tms.taskmanager.entity.User;
+import by.tms.taskmanager.mapper.GeneralMapper;
 import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,29 +22,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JWTTokenProvider jwtTokenProvider;
+    private final GeneralMapper generalMapper;
 
     public UserResponseDto register(RegistrationRequestDto request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent())
             throw new RuntimeException("Email already exists"); //todo throw custom exception
 
-        User userToRegister = User.builder()
-                .name(request.getName())
-                .surname(request.getSurname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .build();
-
+        User userToRegister = generalMapper.mapToUser(request);
+        userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
         userToRegister.setRoles(Collections.singleton(Role.USER));
 
-        userRepository.save(userToRegister);
+        userToRegister = userRepository.save(userToRegister);
 
-        return UserResponseDto.builder()
-                .id(userToRegister.getId())
-                .name(userToRegister.getName())
-                .surname(userToRegister.getSurname())
-                .email(userToRegister.getEmail())
-                .roles(userToRegister.getRoles())
-                .build();
+        return generalMapper.mapToUserResponseDto(userToRegister);
     }
 
     public AuthResponseDto login(AuthRequestDto request) {

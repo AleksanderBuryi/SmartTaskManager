@@ -5,9 +5,9 @@ import by.tms.taskmanager.dto.response.TaskResponseDto;
 import by.tms.taskmanager.dto.response.UserResponseDto;
 import by.tms.taskmanager.entity.Role;
 import by.tms.taskmanager.entity.User;
+import by.tms.taskmanager.mapper.GeneralMapper;
 import by.tms.taskmanager.service.AdminService;
 import by.tms.taskmanager.service.TaskService;
-import by.tms.taskmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,21 +26,16 @@ import java.util.Optional;
 @Tag(name = "Admin commands", description = "Manipulate user info")
 public class AdminController {
     private final AdminService adminService;
-    private final UserService userService;
     private final TaskService taskService;
+    private final GeneralMapper generalMapper;
 
     @GetMapping("/{id}")
     @Operation(summary = "Find user by id")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable("id") Long id) {
         log.info("Get user with id = " + id);
         Optional<User> user = adminService.getUserById(id);
-        return user.map(value -> ResponseEntity.ok(UserResponseDto.builder()
-                .id(value.getId())
-                .name(value.getName())
-                .surname(value.getSurname())
-                .email(value.getEmail())
-                .roles(value.getRoles())
-                .build())).orElseGet(() -> ResponseEntity.notFound().build());
+        return user.map(value -> ResponseEntity.ok(generalMapper.mapToUserResponseDto(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping
@@ -50,13 +45,7 @@ public class AdminController {
         List<User> users = adminService.findAll();
         List<UserResponseDto> userResponseDtoList = new ArrayList<>();
         for (User user : users) {
-            userResponseDtoList.add(UserResponseDto.builder()
-                    .id(user.getId())
-                    .name(user.getName())
-                    .surname(user.getSurname())
-                    .email(user.getEmail())
-                    .roles(user.getRoles())
-                    .build());
+            userResponseDtoList.add(generalMapper.mapToUserResponseDto(user));
         }
         return ResponseEntity.ok(userResponseDtoList);
     }
@@ -73,13 +62,7 @@ public class AdminController {
             }
             adminService.update(user);
 
-            return ResponseEntity.ok(UserResponseDto.builder()
-                    .id(user.getId())
-                    .name(user.getName())
-                    .surname(user.getSurname())
-                    .email(user.getEmail())
-                    .roles(user.getRoles())
-                    .build());
+            return ResponseEntity.ok(generalMapper.mapToUserResponseDto(user));
         } else return ResponseEntity.notFound().build();
     }
 

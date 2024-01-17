@@ -3,6 +3,7 @@ package by.tms.taskmanager.service;
 import by.tms.taskmanager.dto.request.TaskRequestDto;
 import by.tms.taskmanager.dto.response.TaskResponseDto;
 import by.tms.taskmanager.entity.*;
+import by.tms.taskmanager.mapper.GeneralMapper;
 import by.tms.taskmanager.repository.TaskRepository;
 import by.tms.taskmanager.repository.TimeSpentRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TimeSpentRepository timeSpentRepository;
+    private final GeneralMapper generalMapper;
 
     public TaskResponseDto create(TaskRequestDto request, User user) {
         Task task = Task.builder()
@@ -38,14 +40,7 @@ public class TaskService {
                 .build();
         timeSpentRepository.save(timeSpent);
 
-        return TaskResponseDto.builder()
-                .id(task.getId())
-                .name(task.getName())
-                .description(task.getDescription())
-                .startDate(task.getStartDate())
-                .difficulty(task.getDifficulty())
-                .status(task.getStatus())
-                .build();
+        return generalMapper.mapToTaskResponseDto(task);
     }
 
     public List<TaskResponseDto> getTasksByUser(User user) {
@@ -66,15 +61,9 @@ public class TaskService {
         List<TaskResponseDto> taskResponseDtoList = new ArrayList<>();
         for (Task task : tasks) {
             TimeSpent ts = timeSpentRepository.findTimeSpentByTask(task).get();
-            taskResponseDtoList.add(TaskResponseDto.builder()
-                    .id(task.getId())
-                    .name(task.getName())
-                    .description(task.getDescription())
-                    .startDate(task.getStartDate())
-                    .finishDate(ts.getEndTime())
-                    .difficulty(task.getDifficulty())
-                    .status(task.getStatus())
-                    .build());
+            TaskResponseDto responseDto = generalMapper.mapToTaskResponseDto(task);
+            responseDto.setFinishDate(ts.getEndTime());
+            taskResponseDtoList.add(responseDto);
         }
         return taskResponseDtoList;
     }
@@ -88,15 +77,10 @@ public class TaskService {
             timeSpentRepository.save(timeSpent);
         }
 
-        return TaskResponseDto.builder()
-                .id(fromTask.getId())
-                .name(fromTask.getName())
-                .description(fromTask.getDescription())
-                .startDate(fromTask.getStartDate())
-                .finishDate(timeSpent.getEndTime())
-                .difficulty(fromTask.getDifficulty())
-                .status(fromTask.getStatus())
-                .build();
+        TaskResponseDto responseDto = generalMapper.mapToTaskResponseDto(fromTask);
+        responseDto.setFinishDate(timeSpent.getEndTime());
+
+        return responseDto;
     }
 
     @Transactional

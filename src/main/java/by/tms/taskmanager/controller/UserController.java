@@ -6,6 +6,7 @@ import by.tms.taskmanager.dto.request.UpdateUserDto;
 import by.tms.taskmanager.dto.response.AuthResponseDto;
 import by.tms.taskmanager.dto.response.UserResponseDto;
 import by.tms.taskmanager.entity.User;
+import by.tms.taskmanager.mapper.GeneralMapper;
 import by.tms.taskmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Tag(name = "User commands", description = "Registration and authentication user, changing user data")
 public class UserController {
     private final UserService userService;
+    private final GeneralMapper generalMapper;
 
     @PostMapping("/register")
     @Operation(summary = "Registration of user")
@@ -52,13 +54,7 @@ public class UserController {
             existingUser.get().setPassword(userDto.getPassword());
 
             userService.update(existingUser.get());
-            return ResponseEntity.ok(UserResponseDto.builder()
-                    .id(existingUser.get().getId())
-                    .name(existingUser.get().getName())
-                    .surname(existingUser.get().getSurname())
-                    .email(existingUser.get().getEmail())
-                    .roles(existingUser.get().getRoles())
-                    .build());
+            return ResponseEntity.ok(generalMapper.mapToUserResponseDto(existingUser.get()));
         } else {
             return ResponseEntity.notFound().build();
         }
