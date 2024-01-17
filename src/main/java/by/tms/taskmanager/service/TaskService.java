@@ -5,13 +5,11 @@ import by.tms.taskmanager.dto.response.TaskResponseDto;
 import by.tms.taskmanager.entity.*;
 import by.tms.taskmanager.repository.TaskRepository;
 import by.tms.taskmanager.repository.TimeSpentRepository;
-import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +30,7 @@ public class TaskService {
                 .user(user)
                 .build();
 
-        taskRepository.save(task);
+        task = taskRepository.save(task);
 
         TimeSpent timeSpent = TimeSpent.builder()
                 .startTime(LocalDate.now())
@@ -41,6 +39,7 @@ public class TaskService {
         timeSpentRepository.save(timeSpent);
 
         return TaskResponseDto.builder()
+                .id(task.getId())
                 .name(task.getName())
                 .description(task.getDescription())
                 .startDate(task.getStartDate())
@@ -66,11 +65,13 @@ public class TaskService {
     private List<TaskResponseDto> getTaskResponseDtos(List<Task> tasks) {
         List<TaskResponseDto> taskResponseDtoList = new ArrayList<>();
         for (Task task : tasks) {
+            TimeSpent ts = timeSpentRepository.findTimeSpentByTask(task).get();
             taskResponseDtoList.add(TaskResponseDto.builder()
                     .id(task.getId())
                     .name(task.getName())
                     .description(task.getDescription())
                     .startDate(task.getStartDate())
+                    .finishDate(ts.getEndTime())
                     .difficulty(task.getDifficulty())
                     .status(task.getStatus())
                     .build());
@@ -92,6 +93,7 @@ public class TaskService {
                 .name(fromTask.getName())
                 .description(fromTask.getDescription())
                 .startDate(fromTask.getStartDate())
+                .finishDate(timeSpent.getEndTime())
                 .difficulty(fromTask.getDifficulty())
                 .status(fromTask.getStatus())
                 .build();

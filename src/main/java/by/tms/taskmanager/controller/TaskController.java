@@ -9,6 +9,8 @@ import by.tms.taskmanager.entity.Task;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.TaskService;
 import by.tms.taskmanager.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,11 +24,13 @@ import java.util.Optional;
 @RequestMapping("/user/{userId}/tasks")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Task commands", description = "CRUD operations on tasks")
 public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
 
     @PostMapping
+    @Operation(summary = "Create task for user")
     public ResponseEntity<TaskResponseDto> createTask(@PathVariable Long userId, @RequestBody TaskRequestDto request) {
         log.info("Create task by user with id = " + userId);
         Optional<User> user = userService.getUserById(userId);
@@ -36,6 +40,7 @@ public class TaskController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all tasks of user")
     public ResponseEntity<List<TaskResponseDto>> getTasksByUser(@PathVariable Long userId) {
         log.info("Get tasks by user with id =  " + userId);
         Optional<User> user = userService.getUserById(userId);
@@ -44,6 +49,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get task")
     public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Get task by id = " + id);
         Optional<Task> existingTask = taskService.findTaskById(id);
@@ -58,6 +64,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Edit task info")
     public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskRequestDto request, @PathVariable Long userId) {
         Optional<Task> existingTask = taskService.findTaskById(id);
         if (existingTask.isPresent()) {
@@ -75,6 +82,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete task")
     public ResponseEntity<Void> deleteTask(@PathVariable("id") Long id, @PathVariable Long userId) {
         Optional<Task> existingTask = taskService.findTaskById(id);
         if (existingTask.isPresent()) {
@@ -87,7 +95,8 @@ public class TaskController {
     }
 
     @PutMapping("/{id}/complete")
-    public ResponseEntity<TaskResponseDto> completeStep(@PathVariable Long id, @PathVariable Long userId) {
+    @Operation(summary = "Complete task")
+    public ResponseEntity<TaskResponseDto> completeTask(@PathVariable Long id, @PathVariable Long userId) {
         Optional<User> user = userService.getUserById(userId);
         Optional<Task> task = taskService.findTaskById(id);
         if (user.isEmpty() || task.isEmpty()) return ResponseEntity.notFound().build();

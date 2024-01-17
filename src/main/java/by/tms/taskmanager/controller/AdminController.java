@@ -7,13 +7,15 @@ import by.tms.taskmanager.entity.Role;
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.AdminService;
 import by.tms.taskmanager.service.TaskService;
+import by.tms.taskmanager.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,11 +23,14 @@ import java.util.Optional;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Admin commands", description = "Manipulate user info")
 public class AdminController {
     private final AdminService adminService;
+    private final UserService userService;
     private final TaskService taskService;
 
     @GetMapping("/{id}")
+    @Operation(summary = "Find user by id")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable("id") Long id) {
         log.info("Get user with id = " + id);
         Optional<User> user = adminService.getUserById(id);
@@ -39,6 +44,7 @@ public class AdminController {
     }
 
     @GetMapping
+    @Operation(summary = "Find all users")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         log.info("Getting all users");
         List<User> users = adminService.findAll();
@@ -56,27 +62,29 @@ public class AdminController {
     }
 
     @PutMapping("/{id}/role")
+    @Operation(summary = "Add role to user (used to grant administrator rights to other users)")
     public ResponseEntity<UserResponseDto> changeUserRole(@PathVariable("id") Long id, @RequestBody UpdateUserRoleDto userDto) {
         Optional<User> existingUser = adminService.getUserById(id);
         if (existingUser.isPresent()) {
             log.info("Updating user role. User with id = " + id + " was found.");
-            existingUser.get()
-                    .setRoles(Collections.singleton(userDto.getRole().equalsIgnoreCase("ADMIN")
-                            ? Role.ADMIN
-                            : Role.USER));
-            adminService.update(existingUser.get());
+            User user = existingUser.get();
+            if (userDto.getRole().equalsIgnoreCase("ADMIN")) {
+                user.getRoles().add(Role.ADMIN);
+            }
+            adminService.update(user);
 
             return ResponseEntity.ok(UserResponseDto.builder()
-                    .id(existingUser.get().getId())
-                    .name(existingUser.get().getName())
-                    .surname(existingUser.get().getSurname())
-                    .email(existingUser.get().getEmail())
-                    .roles(existingUser.get().getRoles())
+                    .id(user.getId())
+                    .name(user.getName())
+                    .surname(user.getSurname())
+                    .email(user.getEmail())
+                    .roles(user.getRoles())
                     .build());
         } else return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user by id")
     public ResponseEntity<Void> deleteUserById(@PathVariable("id") Long id) {
         log.info("Delete user = " + id);
         adminService.removeById(id);
@@ -84,6 +92,7 @@ public class AdminController {
     }
 
     @GetMapping("/tasks")
+    @Operation(summary = "Get all tasks")
     public ResponseEntity<List<TaskResponseDto>> getAllTasks() {
         log.info("Get all tasks");
         List<TaskResponseDto> tasks = taskService.getAllTasks();

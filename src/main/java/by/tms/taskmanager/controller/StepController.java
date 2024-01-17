@@ -8,6 +8,8 @@ import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.service.StepService;
 import by.tms.taskmanager.service.TaskService;
 import by.tms.taskmanager.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +22,14 @@ import java.util.Optional;
 @RequestMapping("/user/{userId}/tasks/{taskId}/steps")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Step commands", description = "CRUD operations on steps")
 public class StepController {
     private final StepService stepService;
     private final TaskService taskService;
     private final UserService userService;
 
     @PostMapping
+    @Operation(summary = "Create steps of task")
     public ResponseEntity<StepResponseDto> createSteps(@PathVariable Long taskId, @PathVariable Long userId,
                                                        @RequestBody StepRequestDto request) {
         log.info("Create steps by task with id = " + taskId + "by user with id = " + userId);
@@ -36,6 +40,7 @@ public class StepController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all steps of task")
     public ResponseEntity<List<StepResponseDto>> getStepsByTask(@PathVariable Long userId, @PathVariable Long taskId) {
         log.info("Get Steps by task with id =  " + taskId);
         Optional<User> user = userService.getUserById(userId);
@@ -45,6 +50,7 @@ public class StepController {
     }
 
     @PutMapping("/{stepId}")
+    @Operation(summary = "Edit step info")
     public ResponseEntity<StepResponseDto> updateStep(@PathVariable Long stepId,
                                                       @PathVariable Long taskId,
                                                       @PathVariable Long userId,
@@ -62,6 +68,7 @@ public class StepController {
     }
 
     @DeleteMapping("/{stepId}")
+    @Operation(summary = "Delete step")
     public ResponseEntity<Void> deleteStep(@PathVariable Long stepId,
                                            @PathVariable Long taskId,
                                            @PathVariable Long userId) {
@@ -73,6 +80,7 @@ public class StepController {
     }
 
     @PutMapping("/{stepId}/complete")
+    @Operation(summary = "Complete step")
     public ResponseEntity<StepResponseDto> completeStep(@PathVariable Long stepId,
                                              @PathVariable Long taskId,
                                              @PathVariable Long userId) {

@@ -2,6 +2,7 @@ package by.tms.taskmanager.service;
 
 import by.tms.taskmanager.entity.User;
 import by.tms.taskmanager.repository.AdminRepository;
+import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminService {
     private final AdminRepository adminRepository;
+    private final UserRepository userRepository;
 
 
     public Optional<User> getUserById(Long id) {
@@ -33,8 +35,6 @@ public class AdminService {
     }
 
     public void update(User user) {
-        if (user != null) {
-            adminRepository.save(user);
-        }
+        adminRepository.save(user);
     }
 }
