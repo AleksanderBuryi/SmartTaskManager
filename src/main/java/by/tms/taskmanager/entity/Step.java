@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Data
@@ -23,7 +25,8 @@ public class Step {
 
     private boolean isCompleted;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Task task;
 }

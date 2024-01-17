@@ -12,4 +12,5 @@ import java.util.Optional;
 @Repository
 public interface TimeSpentRepository extends JpaRepository<TimeSpent, Long> {
     Optional<TimeSpent> findTimeSpentByTask(Task task);
+    void deleteAllByTaskId(Long id);
 }

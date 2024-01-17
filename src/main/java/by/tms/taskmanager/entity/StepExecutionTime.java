@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +25,8 @@ public class StepExecutionTime {
 
     private LocalDateTime finishTime;
 
-    @ManyToOne
-    @JoinColumn(name = "step_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "step_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Step step;
 }

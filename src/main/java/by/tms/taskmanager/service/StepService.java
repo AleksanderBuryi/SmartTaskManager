@@ -9,6 +9,7 @@ import by.tms.taskmanager.repository.StepExecutionTimeRepository;
 import by.tms.taskmanager.repository.StepRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -84,6 +85,7 @@ public class StepService {
         return stepResponseDtoList;
     }
 
+    @Transactional
     public void deleteStep(Long id) {
         stepRepository.deleteById(id);
     }

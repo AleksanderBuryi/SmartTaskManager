@@ -8,6 +8,7 @@ import by.tms.taskmanager.repository.TimeSpentRepository;
 import by.tms.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -96,6 +97,7 @@ public class TaskService {
                 .build();
     }
 
+    @Transactional
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
     }
