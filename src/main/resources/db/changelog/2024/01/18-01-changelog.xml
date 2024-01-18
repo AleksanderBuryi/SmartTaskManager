@@ -1,0 +1,111 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<databaseChangeLog-->
+<!--        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"-->
+<!--        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-->
+<!--                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"-->
+<!--        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">-->
+<!--    <changeSet id="1" author="author">-->
+
+<!--        <createTable tableName="tb_user">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(255)" nullable="false"/>-->
+<!--            <column name="surname" type="VARCHAR(255)" nullable="false"/>-->
+<!--            <column name="email" type="VARCHAR(255)" unique="true" nullable="false"/>-->
+<!--            <column name="password" type="VARCHAR(255)" nullable="false"/>-->
+
+<!--            <constraints primaryKey="id"/>-->
+<!--        </createTable>-->
+
+<!--        <createTable tableName="tasks">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(255)"/>-->
+<!--            <column name="description" type="VARCHAR(255)"/>-->
+<!--            <column name="startDate" type="DATE"/>-->
+<!--            <column name="difficulty" type="VARCHAR(255)"/>-->
+<!--            <column name="status" type="VARCHAR(255)"/>-->
+<!--            <column name="user_id" type="BIGINT" nullable="false">-->
+
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+
+<!--            <constraints primaryKey="id"/>-->
+
+<!--            <constraints foreignKeyName="fk_user_id"-->
+<!--                         referencedTableName="tb_user"-->
+<!--                         referencedColumnNames="id"-->
+<!--                         baseColumnNames="user_id"-->
+<!--                         baseTableName="tasks"-->
+<!--                         onDelete="CASCADE"/>-->
+<!--        </createTable>-->
+
+<!--        <createTable tableName="steps">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="title" type="VARCHAR(255)"/>-->
+<!--            <column name="description" type="VARCHAR(255)"/>-->
+<!--            <column name="completed" type="BOOLEAN"/>-->
+<!--            <column name="task_id" type="BIGINT" nullable="false">-->
+
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+
+<!--            <constraints primaryKey="id"/>-->
+
+<!--            <constraints foreignKeyName="fk_task_id"-->
+<!--                         referencedTableName="tasks"-->
+<!--                         referencedColumnNames="id"-->
+<!--                         baseColumnNames="task_id"-->
+<!--                         baseTableName="steps"-->
+<!--                         onDelete="CASCADE"/>-->
+<!--        </createTable>-->
+
+<!--        <createTable tableName="time_spent">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="startTime" type="DATE"/>-->
+<!--            <column name="endTime" type="DATE"/>-->
+<!--            <column name="task_id" type="BIGINT" nullable="false">-->
+
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+
+<!--            <constraints primaryKey="id"/>-->
+
+<!--            <constraints foreignKeyName="fk_task_id"-->
+<!--                         referencedTableName="tasks"-->
+<!--                         referencedColumnNames="id"-->
+<!--                         baseColumnNames="task_id"-->
+<!--                         baseTableName="time_spent"-->
+<!--                         onDelete="CASCADE"/>-->
+<!--        </createTable>-->
+
+<!--        <createTable tableName="step_exec_time">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="modifiedTime" type="TIMESTAMP"/>-->
+<!--            <column name="finishTime" type="TIMESTAMP"/>-->
+<!--            <column name="step_id" type="BIGINT" nullable="false">-->
+
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+
+<!--            <constraints primaryKey="id"/>-->
+
+<!--            <constraints foreignKeyName="fk_step_id"-->
+<!--                         referencedTableName="steps"-->
+<!--                         referencedColumnNames="id"-->
+<!--                         baseColumnNames="step_id"-->
+<!--                         baseTableName="step_exec_time"-->
+<!--                         onDelete="CASCADE"/>-->
+<!--        </createTable>-->
+
+<!--    </changeSet>-->
+<!--</databaseChangeLog>-->
